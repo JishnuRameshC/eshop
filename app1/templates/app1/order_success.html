@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <h1>Order Placed Successfully!</h1>
+        <p>Thank you for your order. Your order details are:</p>
+        <ul>
+            <li>Order ID: {{ order.pk }}</li>
+            <li>Total Price: ${{ order.total_price }}</li>
+            <li>Total Price: ${{ order.total_price }}</li>
+
+            <li>Order Date: {{ order.order_date }}</li>
+        </ul>
+        <p>For any further inquiries, please contact our customer support.</p>
+    </div>
+{% endblock %}

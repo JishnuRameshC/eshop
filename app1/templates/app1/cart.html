@@ -1,0 +1,38 @@
+<!-- cart.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <!-- Cart Items -->
+  <div class="container my-5">
+    <h2>Cart</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+          <tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.product.price }}</td>
+            <td>
+              <a href="{% url 'decrease-quantity' item.id %}" class="btn btn-primary">-</a>
+              {{ item.quantity }}
+              <a href="{% url 'increase-quantity' item.id %}" class="btn btn-primary">+</a>
+            </td>
+            <td>{{ item.total_price }}</td>
+          </tr>
+          <p>Total Price: ${{ item.total_price }}</p>
+
+        {% endfor %}
+      </tbody>
+    </table>
+    <a href="{% url 'place-order' %}" class="btn btn-primary">Place Order</a>
+  </div>
+  <!-- Cart Items -->
+{% endblock %}

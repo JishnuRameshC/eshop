@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="mb-4">Place Order</h1>
+        <p class="mb-4">Total Price: ${{ total_price }}</p>
+        <form method="POST" action="{% url 'submit_order' %}">
+            {% csrf_token %}
+            <!-- Customer Information -->
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label>
+                <input type="text" id="name" name="name" class="form-control" required>
+                {% if form.errors.name %}
+                    <small class="text-danger">{{ form.errors.name }}</small>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+                {% if form.errors.email %}
+                    <small class="text-danger">{{ form.errors.email }}</small>
+                {% endif %}
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="mb-3">
+                <label for="address" class="form-label">Address:</label>
+                <textarea id="address" name="address" class="form-control" required></textarea>
+                {% if form.errors.address %}
+                    <small class="text-danger">{{ form.errors.address }}</small>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="city" class="form-label">City:</label>
+                <input type="text" id="city" name="city" class="form-control" required>
+                {% if form.errors.city %}
+                    <small class="text-danger">{{ form.errors.city }}</small>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="state" class="form-label">State:</label>
+                <input type="text" id="state" name="state" class="form-control" required>
+                {% if form.errors.state %}
+                    <small class="text-danger">{{ form.errors.state }}</small>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="zipcode" class="form-label">Zip Code:</label>
+                <input type="text" id="zipcode" name="zipcode" class="form-control" required>
+                {% if form.errors.zipcode %}
+                    <small class="text-danger">{{ form.errors.zipcode }}</small>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit Order</button>
+        </form>
+    </div>
+{% endblock %}

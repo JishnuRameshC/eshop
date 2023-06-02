@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container my-5">
+    <h2>Order Confirmation</h2>
+    <p>Thank you for your order!</p>
+    <h4>Order Details</h4>
+    <p>Order Number: {{ order.pk }}</p>
+    <p>Order Date: {{ order.order_date }}</p>
+    <p>Total Price: {{ order.total_price }}</p>
+    
+    <h4>Order Items</h4>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          
+        </tr>
+      </thead>
+      <tbody>
+        {% for order_item in order.orderitem_set.all %}
+          <tr>
+            <td>{{ order_item.product.name }}</td>
+            <td>{{ order_item.quantity }}</td>
+            <td>{{ order_item.product.price }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

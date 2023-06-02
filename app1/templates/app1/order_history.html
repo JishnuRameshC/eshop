@@ -1,0 +1,33 @@
+<!-- order_history.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container my-5">
+    <h2>Order History</h2>
+    {% if orders %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Order Number</th>
+            <th>Order Date</th>
+            <th>Total Price</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+            <tr>
+              <td>{{ order.pk }}</td>
+              <td>{{ order.order_date }}</td>
+              <td>{{ order.total_price }}</td>
+              <td>{{ order.status }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No orders found.</p>
+    {% endif %}
+  </div>
+{% endblock %}

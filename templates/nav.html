@@ -20,7 +20,7 @@
         <!-- Left links -->
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link text-dark" aria-current="page" href="#">Home</a>
+            <a class="nav-link text-dark" aria-current="page" href="{% url 'product-list' %}">Home</a>
           </li>
           <li class="nav-item">
             <a class="nav-link text-dark" href="#">Categories</a>
@@ -41,9 +41,7 @@
             <a class="nav-link text-dark" href="{% url 'order_history' %}">Order History</a>
           </li>
           
-          <li class="nav-item">
-            <a class="nav-link text-dark" href="#">Menu name</a>
-          </li>
+          
           <!-- Navbar dropdown -->
           <li class="nav-item dropdown">
             <a

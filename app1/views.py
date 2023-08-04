@@ -1,15 +1,51 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.models import User
 from .models import Product, Cart, CartItem,Order, OrderItem, Customer
 from datetime import datetime
 from django.db.models import F, Sum
 from django .urls import reverse
+from django.contrib.auth import authenticate,login,logout
 from decimal import Decimal
 from .forms import OrderForm
 from django.contrib.auth.decorators import login_required
-
-
 from django.contrib import messages
-# Create your views here.
+from django.http import HttpResponse
+
+
+def signup_page(request):
+    if request.method=='POST':
+        uname = request.POST.get('username')
+        email=request.POST.get('email')
+        pass1=request.POST.get('password1')
+        pass2=request.POST.get('password2')
+
+        if pass1!=pass2:
+            return HttpResponse('your password and confrom password are not same !!!')
+        else:
+            my_user = User.objects.create_user(uname,email,pass1)
+            my_user.save()
+            return redirect('login')
+        
+    return render(request,"app1/signup.html")
+
+
+
+def login_page(request):
+    if request.method=='POST':
+        username = request.POST.get('username')
+        pass1 = request.POST.get('pass')
+        user = authenticate(request,username=username,password=pass1)
+        if user is not None:
+            login(request,user)
+            return redirect('product-list')
+        else:
+            return HttpResponse("username or password is incorret") 
+    return render(request,"app1/login.html")
+
+def LogoutPage(request):
+    logout(request)
+    return redirect('login')
+
 def calculate_total(price, quantity):
     return price * quantity
 
@@ -23,20 +59,20 @@ def product_list(request):
     return render(request,'app1/product_list.html',{'products':products})
 
 
-
+@login_required(login_url='login')
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
-    cart, created = Cart.objects.get_or_create(user=request.user)
-    
-    # Check if the product already exists in the cart
-    try:
-        cart_item = cart.cartitem_set.get(product=product)
-        cart_item.quantity += 1
-        cart_item.save()
-    except CartItem.DoesNotExist:
-        # If the product doesn't exist, create a new CartItem
-        cart_item = CartItem.objects.create(cart=cart, product=product, quantity=1)
-    
+
+    if request.user.is_authenticated:
+        cart, created = Cart.objects.get_or_create(user=request.user)
+
+        try:
+            cart_item = cart.cartitem_set.get(product=product)
+            cart_item.quantity += 1
+            cart_item.save()
+        except CartItem.DoesNotExist:
+            cart_item = CartItem.objects.create(cart=cart, product=product, quantity=1)
+
     return redirect('view-cart')
 
 
@@ -46,8 +82,6 @@ def increase_quantity(request, item_id):
     item = get_object_or_404(CartItem, id=item_id)
     item.quantity += 1
     item.save()
-
-    # Update the total price of the cart
     cart = item.cart
     cart.total_price = cart.calculate_total_price()
     cart.save()
@@ -63,8 +97,6 @@ def decrease_quantity(request, item_id):
     if item.quantity > 1:
         item.quantity -= 1
         item.save()
-        
-        # Update the total price of the cart
         cart = item.cart
         cart.total_price -= cart.calculate_total_price()
         cart.save()
@@ -76,10 +108,8 @@ def decrease_quantity(request, item_id):
 
 
 def view_cart(request):
-    # Retrieve the cart for the current user
     cart = get_object_or_404(Cart, user=request.user)
 
-    # Retrieve the items in the cart and order them by their ID or any other desired criteria
     items = cart.cartitem_set.all().order_by('id')
 
     # Calculate the total price for each item
@@ -93,30 +123,18 @@ def view_cart(request):
     return render(request, 'app1/cart.html', context)
 
 
+@login_required(login_url='login')
 def order(request, product_id):
-    # Retrieve the product
     product = get_object_or_404(Product, pk=product_id)
-
-    # Create a new cart or retrieve the existing cart for the user
     cart, created = Cart.objects.get_or_create(user=request.user)
-
-    # Create a new cart item and associate it with the product
     cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-
-    # Increase the quantity of the cart item by 1
     cart_item.quantity += 1
     cart_item.save()
-
-    # Calculate the total price of the cart
     cart.total_price += product.price
     cart.save()
-
-    # Redirect to the cart view
     return redirect('view-cart')
 
 
-from django.shortcuts import render, redirect
-from .forms import OrderForm
 
 def place_order(request):
     cart = Cart.objects.get(user=request.user)
@@ -144,13 +162,10 @@ def place_order(request):
                 city=city,
                 state=state,
                 zipcode=zipcode,
-                total_price=total_price  # Assuming you have a total_price field in your Order model
+                total_price=total_price
             )
             order.save()
-
-            # Redirect to a success page or return a response
-            return redirect('success_page')  # Replace 'success_page' with the URL name of your success page
-
+            return redirect('success_page')
     else:
         form = OrderForm()
 
@@ -159,15 +174,14 @@ def place_order(request):
 
 
 
-@login_required
+@login_required(login_url='login')
 def submit_order(request):
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if form.is_valid():
-            # Get the current user
+            
             user = request.user
             
-            # Create a new customer object
             customer = Customer(user=user)
             customer.name = form.cleaned_data['name']
             customer.email = form.cleaned_data['email']
@@ -177,10 +191,8 @@ def submit_order(request):
             customer.zipcode = form.cleaned_data['zipcode']
             customer.save()
 
-            # Process the order
-            # ...
 
-            return redirect('order-success')  # Replace with your success URL
+            return redirect('order-success')
 
     else:
         form = OrderForm()
